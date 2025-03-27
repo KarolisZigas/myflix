@@ -1,0 +1,40 @@
+{
+  "name": "myflix-server",
+  "version": "1.0.0",
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@apollo/client": "^3.13.5",
+    "@apollo/server": "^4.11.3",
+    "@apollo/usage-reporting-protobuf": "^4.1.1",
+    "@apollo/utils.fetcher": "^3.1.0",
+    "@graphql-tools/utils": "^10.8.6",
+    "@types/body-parser": "^1.19.5",
+    "apollo-server-express": "^3.13.0",
+    "body-parser": "^1.19.0",
+    "graphql": "^16.10.0",
+    "lodash.merge": "^4.6.2",
+    "mongodb": "^6.15.0",
+    "moviedb-promise": "^4.0.7"
+  },
+  "devDependencies": {
+    "@types/dotenv": "^8.2.3",
+    "@types/graphql": "^14.5.0",
+    "@types/lodash.merge": "^4.6.9",
+    "@types/mongodb": "^4.0.7",
+    "@types/node": "^22.13.14",
+    "@typescript-eslint/eslint-plugin": "^8.28.0",
+    "@typescript-eslint/parser": "^8.28.0",
+    "dotenv": "^16.4.7",
+    "eslint": "^9.23.0",
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2"
+  },
+  "scripts": {
+    "start": "nodemon src/index.ts",
+    "seed": "ts-node temp/seed.ts",
+    "clear": "ts-node temp/clear.ts"
+  }
+}
