@@ -1,0 +1,32 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+type Movie {
+  id: ID!
+  title: String!
+  originalId: Int!
+  imdbId: String!
+  description: String
+  rating: Int
+  genre: Genre
+  releaseDate: String
+  poster: String
+}
+type Genre {
+  id: ID!
+  name: String!
+}
+type Query {
+  movies: [Movie!]!
+}
+type Mutation {
+  saveMovie(title: String!, description: String, genre: String, releaseDate: String): Movie!
+}
+"Exposes a URL that specifies the behavior of this scalar."
+directive @specifiedBy(
+    "The URL that specifies the behavior of this scalar."
+    url: String!
+  ) on SCALAR
+"Indicates exactly one field must be supplied and this field must not be `null`."
+directive @oneOf on INPUT_OBJECT

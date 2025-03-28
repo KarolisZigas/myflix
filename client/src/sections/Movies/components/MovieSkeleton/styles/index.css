@@ -1,0 +1,31 @@
+.movie-skeleton__item {
+    display: flex;
+    gap: 20px;
+}
+
+.movie-skeleton {
+    padding: 20px;
+}
+
+.movie-skeleton__item_outer {
+    margin-top: 20px;
+}
+
+.movie-skeleton__content {
+    width: 100%;
+}
+
+.movie-skeleton__image {
+    width: 272px;
+    height: 400px;;
+}
+
+.movie-skeleton__image .ant-skeleton {
+    width: 250px;
+    height: 400px;
+}
+
+.movie-skeleton__image .ant-skeleton .ant-skeleton-image {
+    width: 100%;
+    height: 100%;
+}

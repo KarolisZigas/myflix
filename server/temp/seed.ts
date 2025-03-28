@@ -34,7 +34,8 @@ const seed = async () => {
                     originalId: movie.id,
                     imdbId: movieDetails.imdb_id, // This is the IMDB ID
                     title: movie.title,
-                    overview: movie.overview,
+                    rating: movie.vote_average,
+                    description: movie.overview,
                     releaseDate: movie.release_date,
                     poster: movie.poster_path,
                     genres: movie.genre_ids

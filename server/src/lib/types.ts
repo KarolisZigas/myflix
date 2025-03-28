@@ -1,20 +1,15 @@
 import { Collection, ObjectId } from "mongodb";
 
-export interface Genre {
-    _id: ObjectId;
-    title: string;
-}
-
 export interface Movie {
     _id: ObjectId;
     originalId: number;
-    imdbId: number;
+    imdbId: string;
     title: string;
     rating: number;
     description: string;
     poster: string;
     releaseDate: string;
-    genres: Genre[];
+    genres: number[];
 }
 
 export interface User {

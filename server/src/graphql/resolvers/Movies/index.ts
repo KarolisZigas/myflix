@@ -19,5 +19,8 @@ export const movieResolvers: IResolvers = {
         ) => {
             return 'saveMovie';
         }
+    },
+    Movie: {
+        id: (movie: Movie):string => movie._id.toString()
     }
 }

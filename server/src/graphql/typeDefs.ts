@@ -4,14 +4,13 @@ export const typeDefs = gql`
   type Movie {
     id: ID!
     title: String!
+    originalId: Int!
+    imdbId: String
     description: String
-    genre: Genre
+    rating: Float
+    genres: [Int]
     releaseDate: String
-  }
-
-  type Genre {
-    id: ID!
-    name: String!
+    poster: String
   }
 
   type Query {

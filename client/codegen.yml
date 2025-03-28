@@ -1,0 +1,8 @@
+schema: "./schema.graphql" # Your local schema file
+documents: "src/**/*.{tsx,ts}" # Path to your GraphQL queries/mutations
+generates:
+  src/generated/graphql.ts:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-react-apollo"
