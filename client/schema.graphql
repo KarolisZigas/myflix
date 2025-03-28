@@ -2,26 +2,42 @@ schema {
   query: Query
   mutation: Mutation
 }
+type Viewer {
+  id: ID
+  token: String
+  avatar: String
+  hasWallet: Boolean
+  didRequest: Boolean!
+}
 type Movie {
   id: ID!
   title: String!
   originalId: Int!
-  imdbId: String!
+  imdbId: String
   description: String
-  rating: Int
-  genre: Genre
+  rating: Float
+  genres: [Int]
   releaseDate: String
   poster: String
 }
-type Genre {
-  id: ID!
-  name: String!
+type MovieResponse {
+  movies: [Movie!]!
+  totalPages: Int!
+  totalResults: Int!
+  page: Int!
 }
 type Query {
-  movies: [Movie!]!
+  availableMovies: [Movie!]!
+  searchMovies(title: String!, page: Int): MovieResponse!
+  authUrl: String!
 }
 type Mutation {
   saveMovie(title: String!, description: String, genre: String, releaseDate: String): Movie!
+  logIn(input: LogInInput): Viewer!
+  logOut: Viewer!
+}
+input LogInInput {
+  code: String!
 }
 "Exposes a URL that specifies the behavior of this scalar."
 directive @specifiedBy(

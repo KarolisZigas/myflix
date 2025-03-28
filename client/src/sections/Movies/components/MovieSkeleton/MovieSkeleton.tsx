@@ -20,8 +20,8 @@ export const MovieSkeleton = ({ error = false }: Props) => {
         <div className="movie-skeleton">
             {errorAlert}
             {[1, 2, 3].map((key) => (
-                <div className="movie-skeleton__item_outer">
-                    <div key={key} className="movie-skeleton__item">
+                <div key={key} className="movie-skeleton__item_outer">
+                    <div className="movie-skeleton__item">
                         <div className="movie-skeleton__content">
                             <Skeleton active paragraph={{ rows: 3 }} />
                         </div>
