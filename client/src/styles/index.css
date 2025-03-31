@@ -1,4 +1,23 @@
+/* Import external fonts first */
+@import url('https://fonts.googleapis.com/css?family=Sacramento');
+
+/* Then Tailwind layers */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Then local imports */
+@import './tinyHouse.css';
+@import './components/_antdesign.css';
+
+/* Finally custom styles in appropriate layers */
+@layer components {
+  body {
+    /* @apply bg-red-500; */
+    margin: 0;
+  }
+
+  .ant-spin-nested-loading {
+    
+  }
+}

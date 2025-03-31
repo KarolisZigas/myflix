@@ -8,4 +8,7 @@ module.exports = {
     extend: {},
   },
   plugins: [],
+  corePlugins: {
+    preflight: false, // This prevents Tailwind from resetting Ant Design styles
+  },
 }
