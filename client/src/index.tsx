@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom/client';
 import '@ant-design/v5-patch-for-react-19';
 import {
@@ -9,23 +9,50 @@ import {
   User, 
   Login 
 } from './sections';
+import { LOG_IN } from './lib/graphql/mutations';
+import { LogInMutation as LogInData, LogInMutationVariables as LogInVariables } from './generated/graphql';
 import { BrowserRouter as Router, Routes, Route,  } from 'react-router-dom';
 import reportWebVitals from './reportWebVitals';
-import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
+import { 
+  ApolloClient, 
+  ApolloProvider, 
+  InMemoryCache, 
+  useMutation, 
+  createHttpLink,
+  ApolloLink
+} from '@apollo/client';
 import { Home } from './sections';
 import { Viewer } from './lib/types';
-
-import { Affix, Layout } from 'antd';
+import { AppHeaderSkeleton, ErrorBanner } from './lib/components';
+import { Affix, Layout, Spin } from 'antd';
 import './styles/index.css?';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
-const client = new ApolloClient({
+const httpLink = createHttpLink({
   uri: '/api',
+  credentials: 'include', // Add this to include credentials
+});
+
+const authLink = new ApolloLink((operation, forward) => {
+  const token = sessionStorage.getItem("token");
+  
+  operation.setContext(({ headers = {} }) => ({
+    headers: {
+      ...headers,
+      "X-CSRF-TOKEN": token || "",
+    }
+  }));
+
+  return forward(operation);
+});
+
+const client = new ApolloClient({
+  link: authLink.concat(httpLink),
   cache: new InMemoryCache()
-})
+});
 
 const initialViewer: Viewer = {
   id: null,
@@ -38,9 +65,43 @@ const initialViewer: Viewer = {
 const App = () => {
   const [viewer, setViewer] = useState<Viewer>(initialViewer);
 
+  const [logIn, { error }] = useMutation<LogInData, LogInVariables>(LOG_IN, {
+    onCompleted: data => {
+      if (data && data.logIn) {
+        setViewer(data.logIn as Viewer);
+
+        if (data.logIn.token) {
+          sessionStorage.setItem("token", data.logIn.token);
+        } else {
+          sessionStorage.removeItem("token");
+        }
+      }
+    }
+  })
+
+  const logInRef = useRef(logIn);
+
+  useEffect(() => {
+    logInRef.current();
+  }, []);
+
+
+
+  if (!viewer.didRequest && !error) {
+    <Layout className='app-skeleton'>
+        <AppHeaderSkeleton />
+        <div className="app-skeleton__spin-section">
+          <Spin size="large" tip="Launching Myflix" />
+        </div>
+    </Layout>
+  }
+
+  const logInErrorBanner = error ? <ErrorBanner description="We weren't able to verify if you were logged in. Please try again."/> : null;
+
   return (
     <Router>
       <Layout id='app'>
+        {logInErrorBanner}
         <Affix offsetTop={0} className='app_affix-header'>
           <AppHeader viewer={viewer} setViewer={setViewer}/>
         </Affix>
