@@ -14,7 +14,7 @@ export const Home = () => {
 
     return (
         <Content>
-            <Row gutter={12} justify="space-between" >
+            <Row gutter={12} justify="space-between" className="mt-[20px]">
                 <Col xs={24}>
                     <h1 className="text-center">Search and add movies to your list!</h1>
                 </Col>

@@ -2,6 +2,7 @@ import { IResolvers } from '@graphql-tools/utils';
 import { Database, Movie, User, MovieResponse, Viewer } from '../../../lib/types';
 import { ObjectId, ReturnDocument } from 'mongodb';
 import { DeleteMovieArgs, SaveMovieArgs } from './types';
+import { MovieDb } from 'moviedb-promise';
 
 export const movieResolvers: IResolvers = {
     Query: {
@@ -17,51 +18,65 @@ export const movieResolvers: IResolvers = {
             { title, page = 1, viewerId } : { title: string, page: number, viewerId: string },
             { db } : { db: Database }
         ): Promise<MovieResponse> => {
-            const { MovieDb } = require('moviedb-promise');
-            const moviedb = new MovieDb(process.env.MOVIEDB_API);
+            const moviedb = new MovieDb(process.env.MOVIEDB_API ?? "");
 
-            const moviesDB = await moviedb.searchMovie({
-                query: title,
-                page,
-            })
-
-            const movies = await Promise.all(
-                moviesDB.results.map(async (movie: any) => {
-                    const movieDetails = await moviedb.movieInfo({
-                        id: movie.id,
-                        append_to_response: 'external_ids'
-                    });
-
-                    const existingMovie = await db.movies.findOne({
-                        originalId: movie.id
-                    })
-
-                    const isSaved = existingMovie ? await db.savedMovies.findOne({
-                        movieId: existingMovie._id.toString(),
-                        userId: viewerId
-                    }) : null;
-
-                    return {
-                        _id: new ObjectId(),
-                        originalId: movie.id,
-                        imdbId: movieDetails.imdb_id,
-                        title: movie.title,
-                        rating: movie.vote_average,
-                        description: movie.overview,
-                        releaseDate: movie.release_date,
-                        poster: movie.poster_path,
-                        genres: movie.genre_ids,
-                        isSaved: !!isSaved
-                    };
+            try {
+                const moviesDB = await moviedb.searchMovie({
+                    query: title,
+                    page,
                 })
-            );
+    
+                if (!moviesDB.results) {
+                    throw new Error('Unable to search movies');
+                }
+    
+                const movies = await Promise.all(
+                    moviesDB.results.map(async (movie: any) => {
+                        try {
+                            const movieDetails = await moviedb.movieInfo({
+                                id: movie.id,
+                                append_to_response: 'external_ids'
+                            });
+        
+                            const existingMovie = await db.movies.findOne({
+                                originalId: movie.id
+                            })
+        
+                            const isSaved = existingMovie ? await db.savedMovies.findOne({
+                                movieId: existingMovie._id.toString(),
+                                userId: viewerId
+                            }) : null;
+        
+                            return {
+                                _id: new ObjectId(),
+                                originalId: movie.id,
+                                imdbId: movieDetails.imdb_id || '',
+                                title: movie.title,
+                                rating: movie.vote_average,
+                                description: movie.overview,
+                                releaseDate: movie.release_date,
+                                poster: movie.poster_path,
+                                genres: movie.genre_ids,
+                                isSaved: !!isSaved
+                            };
+                        } catch (error) {
+                            console.error(`Error processing movie ${movie.id}`)
+                            return null;
+                        }
+                    })
+                );
+    
+                const validMovies = movies.filter(movie => movie !== null);
 
-            return {
-                movies, 
-                totalPages: moviesDB.total_pages,
-                totalResults: moviesDB.total_results,
-                page: moviesDB.page
-            };
+                return {
+                    movies: validMovies, 
+                    totalPages: moviesDB.total_pages || 0,
+                    totalResults: moviesDB.total_results || 0,
+                    page: moviesDB.page || 1
+                };
+            } catch (error) {
+                throw new Error(`Failed to search movies: ${error}`);
+            }
         }
     },
     Mutation: {
@@ -160,7 +175,8 @@ export const movieResolvers: IResolvers = {
                 { returnDocument: 'after' }
             )
 
-            if (userMovieUpdate) {
+
+            if (!userMovieUpdate) {
                 throw new Error(`Unable to delete movie from user saved movies.`)
             }
 

@@ -44,3 +44,25 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+- [ ] Home
+  - [ ] Header
+    - [ ] Search
+      - [ ] ITEM (movie)
+    - [ ] User Lists (authorised)
+      - [ ] ITEM (movie)
+    - [ ] Profile
+      - [ ] logout
+  - [ ] User
+    - [ ] Movies list
+      - [ ] Movie
+        - [ ] komentarai, reitingai, diskusijos, nežinau ar daryt movie vidinį ar ne (turbūt daryt)
+        - [ ] Add/remove/rating (authorised)
+    - [ ] Galimybė ištrint, pridėt, comment
+    - [ ] Filtrai - pagal žanrus, rating, abėcėlę
+  - [ ] ITEM (Movie) Search
+    - [ ] ITEM
+      - [ ] Add/remove/ eiti į vidinį
+  - [ ] Latest added movies
+  - [ ] statistika, kokių žanrų daugiausiai
+  - [ ] Galimybė sudaryti sąrašus eiliškumo tvarka - kaip žiūrėjimo order

@@ -11,7 +11,6 @@ export const AddButton = ({ onSaveMovie, onDeleteMovie, isSaved: initialSaved }:
     const [isSaved, setIsSaved] = useState(initialSaved);
 
     const handleClick = () => {
-        console.log('click');
         if (isSaved) {
             onDeleteMovie();
             setIsSaved(false);

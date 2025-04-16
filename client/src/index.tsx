@@ -111,6 +111,10 @@ const App = () => {
           />
           <Route path='/user/:id/movies' Component={MovieList} />
           <Route
+            path='/movies/'
+            element={<Movies viewer={viewer} />}
+            />
+          <Route
             path='/movies/:title'
             element={<Movies viewer={viewer} />}
             />

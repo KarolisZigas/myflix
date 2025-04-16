@@ -11,12 +11,20 @@ import { SEARCH_MOVIES } from "../../lib/graphql/queries/Movie";
 import { SAVE_MOVIE } from "../../lib/graphql/mutations/SaveMovie";
 import { DELETE_MOVIE } from "../../lib/graphql/mutations/DeleteMovie";
 import { ImdbButton, AddButton } from "./components";
+import { Input, Layout, Row, Col } from 'antd';
+import { useNavigate } from "react-router-dom";
+import { USER } from "../../lib/graphql/queries";
+
+const { Search } = Input;
+const { Content } = Layout;
 
 interface Props {
     viewer: Viewer
 }
 
 export const Movies = ({ viewer }: Props) => {
+    const navigate = useNavigate();
+    const { title } = useParams<{ title: string }>();
     const [page, setPage] = useState(1);
     const [saveMovie, 
         {
@@ -28,7 +36,17 @@ export const Movies = ({ viewer }: Props) => {
         },
         onError: (error) => {
             displayErrorMessage(error.message);
-        }
+        },
+        refetchQueries: [
+            {
+                query: USER,
+                variables: { 
+                    id: viewer.id ?? "",
+                    moviesPage: 1,
+                    limit: 4
+                }
+            }
+        ]
     });
 
     const [
@@ -40,25 +58,45 @@ export const Movies = ({ viewer }: Props) => {
         },
         onError: (error) => {
             displayErrorMessage(error.message);
-        }
+        },
+        refetchQueries: [
+            {
+                query: USER,
+                variables: {
+                    id: viewer.id ?? "",
+                    moviesPage: 1,
+                    limit: 4
+                }
+            }
+        ]
     })
-
-    const { title } = useParams<{ title: string }>();
 
     const { data, loading, error } = useQuery<SearchMoviesQuery>(SEARCH_MOVIES, {
         variables: { 
             title,
             page,
             viewerId: viewer.id
-        }
+        },
+        onError: (error) => {
+            displayErrorMessage(error.message);
+        },
+        skip: !title
     });
 
-    const movies = data?.searchMovies.movies || [];
-    const totalPages = data?.searchMovies.totalPages || 0;
+    let movies, totalPages, handlePageChange;
 
-    const handlePageChange = (newPage: number) => {
+    if (title) {
+        movies = data?.searchMovies.movies || [];
+        totalPages = data?.searchMovies.totalPages || 0;
+    }
+
+    handlePageChange = (newPage: number) => {
         setPage(newPage);
     };
+
+    const handleSearch = (input: string) => {
+        navigate(`/movies/${input}`);
+    }
 
     const moviesList = movies ?
     (
@@ -149,10 +187,20 @@ export const Movies = ({ viewer }: Props) => {
     }
 
     return (
-        <div className="">
+        <Content className="">
+            <Row gutter={12} justify="space-between" className="mt-[20px]">
+                {!title && (
+                    <Col xs={24} className="justify-center flex">
+                        <h1>Search for a movie</h1>
+                    </Col>
+                )}
+                <Col xs={24} className="justify-center flex">
+                    <Search onSearch={handleSearch} className="max-w-[50%] mx-auto" defaultValue={title} placeholder="Type a title" enterButton/>
+                </Col>
+            </Row>
             <Spin spinning={loading || saveMovieLoading || deleteMovieLoading}>
                 {moviesList}
             </Spin>
-        </div>
+        </Content>
     )
 };
