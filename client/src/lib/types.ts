@@ -5,3 +5,15 @@ export interface Viewer {
     hasWallet: boolean | null;
     didRequest: boolean;
 }
+
+export interface MovieInput {
+    id: string;
+    originalId: number;
+    imdbId: string;
+    title: string;
+    rating: number | null;
+    description: string;
+    poster: string;
+    releaseDate: string;
+    genres: number[] | null;
+}

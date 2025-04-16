@@ -1,6 +1,30 @@
 import { gql } from 'apollo-server-express';
 
 export const typeDefs = gql`
+  type SavedMovie {
+    id: ID!
+    userId: ID!
+    movieId: ID!
+    savedAt: String!
+    notes: String
+    rating: Int
+    movie: Movie!
+  }
+
+  type SavedMoviesResponse {
+    total: Int!
+    result: [SavedMovie!]!
+  }
+
+  type User {
+    id: ID!
+    name: String!
+    avatar: String!
+    contact: String!
+    income: Int
+    savedMovies(limit: Int!, page: Int!): SavedMoviesResponse
+  }
+
   type Viewer {
     id: ID
     token: String
@@ -19,6 +43,7 @@ export const typeDefs = gql`
     genres: [Int]
     releaseDate: String
     poster: String
+    isSaved: Boolean
   }
 
   type MovieResponse {
@@ -32,19 +57,28 @@ export const typeDefs = gql`
     code: String!
   }
 
+  input MovieInput {
+    id: ID!
+    title: String!
+    originalId: Int!
+    imdbId: String
+    description: String
+    rating: Float
+    genres: [Int]
+    releaseDate: String
+    poster: String
+  }
+
   type Query {
     availableMovies: [Movie!]!
-    searchMovies(title: String!, page: Int): MovieResponse!
+    searchMovies(title: String!, page: Int, viewerId: String): MovieResponse!
     authUrl: String!
+    user(id: ID!): User!
   }
 
   type Mutation {
-    saveMovie(
-      title: String!
-      description: String
-      genre: String
-      releaseDate: String
-    ): Movie!
+    saveMovie(movie: MovieInput, userId: ID!): String
+    deleteMovie(movieId: Int!, userId: ID!): String
     logIn(input: LogInInput): Viewer!
     logOut: Viewer!
   }

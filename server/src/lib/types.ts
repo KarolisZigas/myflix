@@ -18,6 +18,21 @@ export interface Movie {
     poster: string;
     releaseDate: string;
     genres: number[];
+    isSaved?: boolean;
+}
+
+export interface SavedMovie {
+    _id: ObjectId;
+    userId: string;
+    movieId: string;
+    savedAt: string;
+    notes: string;
+    rating: number | null;
+  }
+
+export interface SavedMoviesResponse {
+    total: number;
+    result: SavedMovie[];
 }
 
 export interface MovieResponse {
@@ -29,14 +44,16 @@ export interface MovieResponse {
 
 export interface User {
     _id: string;
-    movies: string[];
+    savedMovies: ObjectId[];
     token: string,
     avatar: string,
     name: string,
     contact: string,
+    authorized?: boolean;
 }
 
 export interface Database {
     users: Collection<User>;
     movies: Collection<Movie>;
+    savedMovies: Collection<SavedMovie>
 }

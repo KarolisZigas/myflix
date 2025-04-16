@@ -85,8 +85,6 @@ const App = () => {
     logInRef.current();
   }, []);
 
-
-
   if (!viewer.didRequest && !error) {
     <Layout className='app-skeleton'>
         <AppHeaderSkeleton />
@@ -107,9 +105,15 @@ const App = () => {
         </Affix>
         <Routes>
           <Route path='/' Component={Home} />
-          <Route path='/user/:id' Component={User}/>
+          <Route 
+            path='/user/:id'
+            element={<User viewer={viewer} />}
+          />
           <Route path='/user/:id/movies' Component={MovieList} />
-          <Route path='/movies/:title' Component={Movies}/>
+          <Route
+            path='/movies/:title'
+            element={<Movies viewer={viewer} />}
+            />
           <Route 
             path='/login' 
             element={<Login setViewer={setViewer} />}

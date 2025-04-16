@@ -1,79 +1,55 @@
 import { useState } from "react";
-import { useQuery, gql } from "@apollo/client";
-import { AvailableMoviesQuery, SearchMoviesQuery } from "../../generated/graphql";
+import { useQuery, useMutation } from "@apollo/client";
+import { DeleteMovieMutation, DeleteMovieMutationVariables, SaveMovieMutation, SaveMovieMutationVariables, SearchMoviesQuery } from "../../generated/graphql";
 import { List, Spin } from 'antd';
 import { MovieSkeleton } from './components';
 import { useParams } from "react-router-dom";
 import './styles/index.css'
+import { Viewer } from "../../lib/types";
+import { displayErrorMessage, displaySuccessNotification } from "../../lib/utils";
+import { SEARCH_MOVIES } from "../../lib/graphql/queries/Movie";
+import { SAVE_MOVIE } from "../../lib/graphql/mutations/SaveMovie";
+import { DELETE_MOVIE } from "../../lib/graphql/mutations/DeleteMovie";
+import { ImdbButton, AddButton } from "./components";
 
-const AVAILABLE_MOVIES = gql`
-    query availableMovies {
-        availableMovies {
-            id
-            originalId
-            imdbId
-            title
-            rating
-            description
-            poster
-            releaseDate
-            genres
-        }
-    }
-`
-
-const SEARCH_MOVIES = gql`
-    query searchMovies($title: String!, $page: Int) {
-        searchMovies(title: $title, page: $page) {
-            movies {
-                id
-                originalId
-                imdbId
-                title
-                rating
-                description
-                poster
-                releaseDate
-                genres
-            }
-            totalPages
-            totalResults
-            page
-        }
-    }
-`
-
-const ImdbButton = ({ imdb, image, text }: { imdb: string | null | undefined; image: string; text?: string }) => {
-    if (!imdb) {
-        return null;
-    }
-
-    return (
-        <div style={{width: 50, height: 20}}>
-            <a target="_blank" rel="noreferrer" href={`https://www.imdb.com/title/${imdb}`}>
-                <img style={{width: '100%', height: '100%'}} src={image} alt={text} />
-            </a>
-            {text}
-        </div>
-      );
+interface Props {
+    viewer: Viewer
 }
 
-const AddToListButton = ({ id }: { id: string }) => {
-    return (
-        <div className="add-to-list-button" style={{width: 50}}>
-            Add
-        </div>
-      );
-}
-
-export const Movies = () => {
+export const Movies = ({ viewer }: Props) => {
     const [page, setPage] = useState(1);
+    const [saveMovie, 
+        {
+            loading: saveMovieLoading
+        }
+    ] = useMutation<SaveMovieMutation, SaveMovieMutationVariables>(SAVE_MOVIE, {
+        onCompleted: () => {
+            displaySuccessNotification('Movie added to your list!');
+        },
+        onError: (error) => {
+            displayErrorMessage(error.message);
+        }
+    });
+
+    const [
+        deleteMovie,
+        { loading: deleteMovieLoading}
+    ] = useMutation<DeleteMovieMutation, DeleteMovieMutationVariables>(DELETE_MOVIE, {
+        onCompleted: () => {
+            displaySuccessNotification('Movie removed from your list!');
+        },
+        onError: (error) => {
+            displayErrorMessage(error.message);
+        }
+    })
+
     const { title } = useParams<{ title: string }>();
 
     const { data, loading, error } = useQuery<SearchMoviesQuery>(SEARCH_MOVIES, {
         variables: { 
             title,
-            page
+            page,
+            viewerId: viewer.id
         }
     });
 
@@ -101,8 +77,34 @@ export const Movies = () => {
                 <List.Item
                     key={item.id}
                     actions={[
-                        <AddToListButton 
-                            id={item.id}
+                        <AddButton 
+                            onSaveMovie={() => {
+                                saveMovie({
+                                    variables: {
+                                        movie: {
+                                            id: item.id,
+                                            title: item.title,
+                                            originalId: item.originalId,
+                                            imdbId: item.imdbId || '',
+                                            description: item.description || '',
+                                            rating: item.rating || null,
+                                            genres: item.genres?.filter((genre): genre is number => genre !== null) || null,
+                                            releaseDate: item.releaseDate || '',
+                                            poster: item.poster || ''
+                                        },
+                                        userId: viewer.id ?? ''
+                                    }
+                                })
+                            }}
+                            onDeleteMovie={() => {
+                                deleteMovie({
+                                    variables: {
+                                        movieId: item.originalId,
+                                        userId: viewer.id ?? ''
+                                    }
+                                })
+                            }}
+                            isSaved={item.isSaved}
                         />,
                         <ImdbButton 
                             imdb={item.imdbId}
@@ -148,7 +150,7 @@ export const Movies = () => {
 
     return (
         <div className="">
-            <Spin spinning={loading}>
+            <Spin spinning={loading || saveMovieLoading || deleteMovieLoading}>
                 {moviesList}
             </Spin>
         </div>

@@ -13,7 +13,6 @@ const cookieOptions = {
 }
 
 
-
 const logInViaGoogle = async (
     code: string,
     token: string,
@@ -79,7 +78,7 @@ const logInViaGoogle = async (
       name: userName,
       avatar: userAvatar,
       contact: userEmail,
-      movies: [],
+      savedMovies: [],
     });
 
     viewer = await db.users.findOne({ _id: userId });
