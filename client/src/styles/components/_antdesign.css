@@ -1,3 +1,25 @@
-.ant-spin-nested-loading {
-    
+.ant-card-meta-description {
+    @apply line-clamp-3;
+}
+
+.user-listings .ant-list .ant-row {
+    @apply justify-center;
+}
+
+.ant-card {
+    @apply max-w-[100%];
+}
+
+.ant-card .ant-card-cover {
+    @apply rounded-none w-[100%-2px] ml-[1px];
+}
+
+.ant-card .ant-card-cover img {
+    @apply aspect-[3/4] object-cover object-top rounded-none;
+}
+
+@media (max-width: 575.98px) {
+    .ant-card {
+        @apply max-w-[100%] w-[100%] !important;
+    }
 }

@@ -10,7 +10,7 @@ import { PageSkeleton, ErrorBanner } from "../../lib/components";
 
 const { Content } = Layout;
 
-const PAGE_LIMIT = 4;
+const PAGE_LIMIT = 10;
 
 interface Props {
     viewer: Viewer;
@@ -30,7 +30,7 @@ export const User = (
         },
         onCompleted: (data) => {
             if (data.user) {
-                console.log()
+                
             }
         }
     });
