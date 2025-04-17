@@ -18,6 +18,10 @@
     @apply aspect-[3/4] object-cover object-top rounded-none;
 }
 
+.ant-card .ant-card-actions li {
+    @apply py-[12px] m-0 transition-[background-color] hover:bg-[rgba(0,0,0,0.05)];
+}
+
 @media (max-width: 575.98px) {
     .ant-card {
         @apply max-w-[100%] w-[100%] !important;
