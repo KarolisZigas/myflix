@@ -77,6 +77,32 @@ export const movieResolvers: IResolvers = {
             } catch (error) {
                 throw new Error(`Failed to search movies: ${error}`);
             }
+        },
+        searchMovieId: async (
+            _root: undefined,
+            { originalId }: { originalId: number },
+            { db }: { db: Database }
+        ): Promise<Movie> => {
+            // console.log(searchMovieId);
+            const foundMovie = await db.movies.findOne({
+                originalId: originalId
+            })
+
+            if (!foundMovie) {
+                throw new Error('Unable to find this movie.');
+            }
+
+            return {
+                _id: new ObjectId(foundMovie._id),
+                originalId: foundMovie.originalId,
+                imdbId: foundMovie.imdbId,
+                title: foundMovie.title,
+                rating: foundMovie.rating,
+                description: foundMovie.description,
+                poster: foundMovie.poster,
+                releaseDate: foundMovie.releaseDate,
+                genres: foundMovie.genres
+            };
         }
     },
     Mutation: {
@@ -191,7 +217,7 @@ export const movieResolvers: IResolvers = {
             }
 
             return movieId.toString();
-        }
+        },
     },
     Movie: {
         id: (movie: Movie): string => movie._id.toString()

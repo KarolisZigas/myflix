@@ -4,12 +4,17 @@ schema {
 }
 type SavedMovie {
   id: ID!
-  userId: ID!
+  userId: UserIdResolverResponse
   movieId: ID!
   savedAt: String!
   notes: String
-  rating: Int
+  rating: Float
   movie: Movie!
+}
+type UserIdResolverResponse {
+  name: String!
+  avatar: String!
+  id: String!
 }
 type SavedMoviesResponse {
   total: Int!
@@ -21,6 +26,7 @@ type User {
   avatar: String!
   contact: String!
   income: Int
+  authorized: Boolean
   savedMovies(limit: Int!, page: Int!): SavedMoviesResponse
 }
 type Viewer {
@@ -49,12 +55,15 @@ type MovieResponse {
   page: Int!
 }
 type Query {
+  getComments(movieId: Int): SavedMoviesResponse!
   availableMovies: [Movie!]!
+  searchMovieId(originalId: Int!): Movie!
   searchMovies(title: String!, page: Int, viewerId: String): MovieResponse!
   authUrl: String!
   user(id: ID!): User!
 }
 type Mutation {
+  addComments(saveMovieId: ID!, details: MovieDetailsInput): String
   saveMovie(movie: MovieInput, userId: ID!): String
   deleteMovie(movieId: Int!, userId: ID!): String
   logIn(input: LogInInput): Viewer!
@@ -73,6 +82,10 @@ input MovieInput {
   genres: [Int]
   releaseDate: String
   poster: String
+}
+input MovieDetailsInput {
+  note: String
+  rating: Float
 }
 "Exposes a URL that specifies the behavior of this scalar."
 directive @specifiedBy(

@@ -17,3 +17,8 @@ export interface MovieInput {
     releaseDate: string;
     genres: number[] | null;
 }
+
+export interface MovieDetailsInput {
+    note: string;
+    rating: number;
+}

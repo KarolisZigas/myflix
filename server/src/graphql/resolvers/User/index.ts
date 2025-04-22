@@ -21,9 +21,11 @@ export const userResolvers: IResolvers = {
                     throw new Error("User can't be found");
                 }
 
+                user.authorized = false;
+
                 const viewer = await authorize(db, req);
 
-                if (viewer && viewer._id == id) {
+                if (viewer && viewer._id === id) {
                     user.authorized = true;
                 }
 

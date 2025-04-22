@@ -16,6 +16,23 @@ export const AVAILABLE_MOVIES = gql`
     }
 `
 
+export const SEARCH_MOVIE_ID = gql`
+    query searchMovieId($originalId: Int!) {
+        searchMovieId(originalId: $originalId) {
+            id
+            title
+            originalId
+            imdbId
+            description
+            rating
+            genres
+            releaseDate
+            poster
+            isSaved
+        }
+    }
+`
+
 export const SEARCH_MOVIES = gql`
     query searchMovies($title: String!, $page: Int, $viewerId: String) {
         searchMovies(title: $title, page: $page, viewerId: $viewerId) {

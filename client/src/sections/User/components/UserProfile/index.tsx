@@ -1,6 +1,8 @@
 import React, { Fragment } from 'react';
 import { UserQuery as UserData } from '../../../../generated/graphql';
 import { Avatar, Button, Card, Divider, Typography } from 'antd';
+import { CameraOutlined } from '@ant-design/icons';
+import { Link, useParams } from 'react-router-dom';
 
 interface Props {
     user: UserData["user"];
@@ -10,23 +12,26 @@ interface Props {
 const { Paragraph, Text, Title } = Typography;
 
 export const UserProfile = ({ user, viewerIsUser }: Props) => {
+    const params = useParams();
 
     const additionalDetailsSection = viewerIsUser ? (
         <Fragment>
             <Divider />
             <div className="user-profile__details">
                 <Title level={4}>
-                    Additional Details
+                    Movies
                 </Title>
                 <Paragraph>
-                    Interested in becoming a Host?
+                    Check out the movies you saved
                 </Paragraph>
                 <Button type="primary" className='user-profile__details-cta'>
-                    Connect
+                    <Link to={`/user/${params.id}/movies`}>
+                        Go to the list
+                    </Link>
                 </Button>
-                <Paragraph type='secondary'>
+                {/* <Paragraph type='secondary'>
                     TinyHouse uses lalala
-                </Paragraph>
+                </Paragraph> */}
             </div>
         </Fragment>
     ) : null;

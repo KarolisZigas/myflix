@@ -3,7 +3,7 @@ import { useQuery, useMutation } from "@apollo/client";
 import { DeleteMovieMutation, DeleteMovieMutationVariables, SaveMovieMutation, SaveMovieMutationVariables, SearchMoviesQuery } from "../../generated/graphql";
 import { List, Spin } from 'antd';
 import { MovieSkeleton } from './components';
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import './styles/index.css'
 import { Viewer } from "../../lib/types";
 import { displayErrorMessage, displaySuccessNotification } from "../../lib/utils";
@@ -151,11 +151,14 @@ export const Movies = ({ viewer }: Props) => {
                         />
                       ]}
                     extra={
-                        <img
-                            width={272}
-                            alt="Movie Poster"
-                            src={`https://image.tmdb.org/t/p/original/${item.poster}`}
-                        />
+                        
+                        <Link to={`/movie/${item.originalId}`}>
+                            <img
+                                width={272}
+                                alt="Movie Poster"
+                                src={`https://image.tmdb.org/t/p/original/${item.poster}`}
+                            />
+                        </Link>
                     }
                 >
                     <List.Item.Meta

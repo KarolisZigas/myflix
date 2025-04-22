@@ -7,11 +7,14 @@ export const USER = gql`
             name
             avatar
             contact
+            authorized
             savedMovies(limit: $limit, page: $moviesPage) {
                 total
                 result {
                     id
-                    userId
+                    userId {
+                        id
+                    }
                     movieId
                     savedAt
                     notes

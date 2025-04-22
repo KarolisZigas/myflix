@@ -1,18 +1,30 @@
-import React from "react";
 import { MovieCard } from "../../../../lib/components";
 import { List, Typography } from "antd";
 import { SavedMovie, User } from "../../../../generated/graphql";
 
 interface Props {
-    userMovies: User['savedMovies'];
+    userMovies: {
+        total: number;
+        result: {
+            id: string;
+            movieId: string;
+            savedAt: string;
+            notes?: string | null;
+            rating?: number | null;
+            userId?: {
+                id: string;
+            } | null;
+            movie: any;
+        }[];
+    };
     moviesPage: number;
     limit: number;
     setMoviesPage: (page: number) => void;
 }
 
-const { Paragraph, Title } = Typography;
+const { Title } = Typography;
 
-export const UserMovies = ({ 
+export const UserMoviesList = ({ 
     userMovies, 
     moviesPage, 
     limit, 
@@ -42,20 +54,19 @@ export const UserMovies = ({
             }}
             renderItem={(movie) => (
                 <List.Item>
-                    <MovieCard movie={movie} />
+                    <MovieCard 
+                        movie={movie} 
+                    />
                 </List.Item>
             )}
         />
     ) : null;
 
     const userMoviesElement = userMoviesList ? (
-        <div className="user-listings">
-            <Title level={4} className="user-listings__title" >
+        <div className="user-listings pt-0">
+            <Title level={4} className="user-listings__title mt-0" >
                 Movies
             </Title>
-            <Paragraph className="user-listings__description">
-                Saved movies
-            </Paragraph>
             {userMoviesList}
         </div>
     ) : null;

@@ -35,6 +35,11 @@ export type Movie = {
   title: Scalars['String']['output'];
 };
 
+export type MovieDetailsInput = {
+  note?: InputMaybe<Scalars['String']['input']>;
+  rating?: InputMaybe<Scalars['Float']['input']>;
+};
+
 export type MovieInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   genres?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
@@ -57,10 +62,17 @@ export type MovieResponse = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addComments?: Maybe<Scalars['String']['output']>;
   deleteMovie?: Maybe<Scalars['String']['output']>;
   logIn: Viewer;
   logOut: Viewer;
   saveMovie?: Maybe<Scalars['String']['output']>;
+};
+
+
+export type MutationAddCommentsArgs = {
+  details?: InputMaybe<MovieDetailsInput>;
+  saveMovieId: Scalars['ID']['input'];
 };
 
 
@@ -84,8 +96,20 @@ export type Query = {
   __typename?: 'Query';
   authUrl: Scalars['String']['output'];
   availableMovies: Array<Movie>;
+  getComments: SavedMoviesResponse;
+  searchMovieId: Movie;
   searchMovies: MovieResponse;
   user: User;
+};
+
+
+export type QueryGetCommentsArgs = {
+  movieId?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QuerySearchMovieIdArgs = {
+  originalId: Scalars['Int']['input'];
 };
 
 
@@ -106,9 +130,9 @@ export type SavedMovie = {
   movie: Movie;
   movieId: Scalars['ID']['output'];
   notes?: Maybe<Scalars['String']['output']>;
-  rating?: Maybe<Scalars['Int']['output']>;
+  rating?: Maybe<Scalars['Float']['output']>;
   savedAt: Scalars['String']['output'];
-  userId: Scalars['ID']['output'];
+  userId?: Maybe<UserIdResolverResponse>;
 };
 
 export type SavedMoviesResponse = {
@@ -119,6 +143,7 @@ export type SavedMoviesResponse = {
 
 export type User = {
   __typename?: 'User';
+  authorized?: Maybe<Scalars['Boolean']['output']>;
   avatar: Scalars['String']['output'];
   contact: Scalars['String']['output'];
   id: Scalars['ID']['output'];
@@ -133,6 +158,13 @@ export type UserSavedMoviesArgs = {
   page: Scalars['Int']['input'];
 };
 
+export type UserIdResolverResponse = {
+  __typename?: 'UserIdResolverResponse';
+  avatar: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+};
+
 export type Viewer = {
   __typename?: 'Viewer';
   avatar?: Maybe<Scalars['String']['output']>;
@@ -141,6 +173,14 @@ export type Viewer = {
   id?: Maybe<Scalars['ID']['output']>;
   token?: Maybe<Scalars['String']['output']>;
 };
+
+export type AddCommentsMutationVariables = Exact<{
+  saveMovieId: Scalars['ID']['input'];
+  details?: InputMaybe<MovieDetailsInput>;
+}>;
+
+
+export type AddCommentsMutation = { __typename?: 'Mutation', addComments?: string | null };
 
 export type DeleteMovieMutationVariables = Exact<{
   movieId: Scalars['Int']['input'];
@@ -175,10 +215,24 @@ export type AuthUrlQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type AuthUrlQuery = { __typename?: 'Query', authUrl: string };
 
+export type GetCommentsQueryVariables = Exact<{
+  movieId: Scalars['Int']['input'];
+}>;
+
+
+export type GetCommentsQuery = { __typename?: 'Query', getComments: { __typename?: 'SavedMoviesResponse', total: number, result: Array<{ __typename?: 'SavedMovie', id: string, movieId: string, savedAt: string, notes?: string | null, rating?: number | null, userId?: { __typename?: 'UserIdResolverResponse', avatar: string, id: string, name: string } | null }> } };
+
 export type AvailableMoviesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type AvailableMoviesQuery = { __typename?: 'Query', availableMovies: Array<{ __typename?: 'Movie', id: string, originalId: number, imdbId?: string | null, title: string, rating?: number | null, description?: string | null, poster?: string | null, releaseDate?: string | null, genres?: Array<number | null> | null }> };
+
+export type SearchMovieIdQueryVariables = Exact<{
+  originalId: Scalars['Int']['input'];
+}>;
+
+
+export type SearchMovieIdQuery = { __typename?: 'Query', searchMovieId: { __typename?: 'Movie', id: string, title: string, originalId: number, imdbId?: string | null, description?: string | null, rating?: number | null, genres?: Array<number | null> | null, releaseDate?: string | null, poster?: string | null, isSaved?: boolean | null } };
 
 export type SearchMoviesQueryVariables = Exact<{
   title: Scalars['String']['input'];
@@ -196,9 +250,41 @@ export type UserQueryVariables = Exact<{
 }>;
 
 
-export type UserQuery = { __typename?: 'Query', user: { __typename?: 'User', id: string, name: string, avatar: string, contact: string, savedMovies?: { __typename?: 'SavedMoviesResponse', total: number, result: Array<{ __typename?: 'SavedMovie', id: string, userId: string, movieId: string, savedAt: string, notes?: string | null, rating?: number | null, movie: { __typename?: 'Movie', id: string, originalId: number, imdbId?: string | null, genres?: Array<number | null> | null, title: string, poster?: string | null, rating?: number | null, releaseDate?: string | null, description?: string | null, isSaved?: boolean | null } }> } | null } };
+export type UserQuery = { __typename?: 'Query', user: { __typename?: 'User', id: string, name: string, avatar: string, contact: string, authorized?: boolean | null, savedMovies?: { __typename?: 'SavedMoviesResponse', total: number, result: Array<{ __typename?: 'SavedMovie', id: string, movieId: string, savedAt: string, notes?: string | null, rating?: number | null, userId?: { __typename?: 'UserIdResolverResponse', id: string } | null, movie: { __typename?: 'Movie', id: string, originalId: number, imdbId?: string | null, genres?: Array<number | null> | null, title: string, poster?: string | null, rating?: number | null, releaseDate?: string | null, description?: string | null, isSaved?: boolean | null } }> } | null } };
 
 
+export const AddCommentsDocument = gql`
+    mutation addComments($saveMovieId: ID!, $details: MovieDetailsInput) {
+  addComments(saveMovieId: $saveMovieId, details: $details)
+}
+    `;
+export type AddCommentsMutationFn = Apollo.MutationFunction<AddCommentsMutation, AddCommentsMutationVariables>;
+
+/**
+ * __useAddCommentsMutation__
+ *
+ * To run a mutation, you first call `useAddCommentsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddCommentsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addCommentsMutation, { data, loading, error }] = useAddCommentsMutation({
+ *   variables: {
+ *      saveMovieId: // value for 'saveMovieId'
+ *      details: // value for 'details'
+ *   },
+ * });
+ */
+export function useAddCommentsMutation(baseOptions?: Apollo.MutationHookOptions<AddCommentsMutation, AddCommentsMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddCommentsMutation, AddCommentsMutationVariables>(AddCommentsDocument, options);
+      }
+export type AddCommentsMutationHookResult = ReturnType<typeof useAddCommentsMutation>;
+export type AddCommentsMutationResult = Apollo.MutationResult<AddCommentsMutation>;
+export type AddCommentsMutationOptions = Apollo.BaseMutationOptions<AddCommentsMutation, AddCommentsMutationVariables>;
 export const DeleteMovieDocument = gql`
     mutation deleteMovie($movieId: Int!, $userId: ID!) {
   deleteMovie(movieId: $movieId, userId: $userId)
@@ -373,6 +459,58 @@ export type AuthUrlQueryHookResult = ReturnType<typeof useAuthUrlQuery>;
 export type AuthUrlLazyQueryHookResult = ReturnType<typeof useAuthUrlLazyQuery>;
 export type AuthUrlSuspenseQueryHookResult = ReturnType<typeof useAuthUrlSuspenseQuery>;
 export type AuthUrlQueryResult = Apollo.QueryResult<AuthUrlQuery, AuthUrlQueryVariables>;
+export const GetCommentsDocument = gql`
+    query getComments($movieId: Int!) {
+  getComments(movieId: $movieId) {
+    total
+    result {
+      id
+      userId {
+        avatar
+        id
+        name
+      }
+      movieId
+      savedAt
+      notes
+      rating
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetCommentsQuery__
+ *
+ * To run a query within a React component, call `useGetCommentsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCommentsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCommentsQuery({
+ *   variables: {
+ *      movieId: // value for 'movieId'
+ *   },
+ * });
+ */
+export function useGetCommentsQuery(baseOptions: Apollo.QueryHookOptions<GetCommentsQuery, GetCommentsQueryVariables> & ({ variables: GetCommentsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetCommentsQuery, GetCommentsQueryVariables>(GetCommentsDocument, options);
+      }
+export function useGetCommentsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCommentsQuery, GetCommentsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetCommentsQuery, GetCommentsQueryVariables>(GetCommentsDocument, options);
+        }
+export function useGetCommentsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetCommentsQuery, GetCommentsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetCommentsQuery, GetCommentsQueryVariables>(GetCommentsDocument, options);
+        }
+export type GetCommentsQueryHookResult = ReturnType<typeof useGetCommentsQuery>;
+export type GetCommentsLazyQueryHookResult = ReturnType<typeof useGetCommentsLazyQuery>;
+export type GetCommentsSuspenseQueryHookResult = ReturnType<typeof useGetCommentsSuspenseQuery>;
+export type GetCommentsQueryResult = Apollo.QueryResult<GetCommentsQuery, GetCommentsQueryVariables>;
 export const AvailableMoviesDocument = gql`
     query availableMovies {
   availableMovies {
@@ -420,6 +558,55 @@ export type AvailableMoviesQueryHookResult = ReturnType<typeof useAvailableMovie
 export type AvailableMoviesLazyQueryHookResult = ReturnType<typeof useAvailableMoviesLazyQuery>;
 export type AvailableMoviesSuspenseQueryHookResult = ReturnType<typeof useAvailableMoviesSuspenseQuery>;
 export type AvailableMoviesQueryResult = Apollo.QueryResult<AvailableMoviesQuery, AvailableMoviesQueryVariables>;
+export const SearchMovieIdDocument = gql`
+    query searchMovieId($originalId: Int!) {
+  searchMovieId(originalId: $originalId) {
+    id
+    title
+    originalId
+    imdbId
+    description
+    rating
+    genres
+    releaseDate
+    poster
+    isSaved
+  }
+}
+    `;
+
+/**
+ * __useSearchMovieIdQuery__
+ *
+ * To run a query within a React component, call `useSearchMovieIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchMovieIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSearchMovieIdQuery({
+ *   variables: {
+ *      originalId: // value for 'originalId'
+ *   },
+ * });
+ */
+export function useSearchMovieIdQuery(baseOptions: Apollo.QueryHookOptions<SearchMovieIdQuery, SearchMovieIdQueryVariables> & ({ variables: SearchMovieIdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SearchMovieIdQuery, SearchMovieIdQueryVariables>(SearchMovieIdDocument, options);
+      }
+export function useSearchMovieIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SearchMovieIdQuery, SearchMovieIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SearchMovieIdQuery, SearchMovieIdQueryVariables>(SearchMovieIdDocument, options);
+        }
+export function useSearchMovieIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<SearchMovieIdQuery, SearchMovieIdQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<SearchMovieIdQuery, SearchMovieIdQueryVariables>(SearchMovieIdDocument, options);
+        }
+export type SearchMovieIdQueryHookResult = ReturnType<typeof useSearchMovieIdQuery>;
+export type SearchMovieIdLazyQueryHookResult = ReturnType<typeof useSearchMovieIdLazyQuery>;
+export type SearchMovieIdSuspenseQueryHookResult = ReturnType<typeof useSearchMovieIdSuspenseQuery>;
+export type SearchMovieIdQueryResult = Apollo.QueryResult<SearchMovieIdQuery, SearchMovieIdQueryVariables>;
 export const SearchMoviesDocument = gql`
     query searchMovies($title: String!, $page: Int, $viewerId: String) {
   searchMovies(title: $title, page: $page, viewerId: $viewerId) {
@@ -483,11 +670,14 @@ export const UserDocument = gql`
     name
     avatar
     contact
+    authorized
     savedMovies(limit: $limit, page: $moviesPage) {
       total
       result {
         id
-        userId
+        userId {
+          id
+        }
         movieId
         savedAt
         notes

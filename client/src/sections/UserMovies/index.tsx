@@ -4,9 +4,9 @@ import { useQuery } from "@apollo/client";
 import { USER } from "../../lib/graphql/queries";
 import { UserQuery as UserData, UserQueryVariables } from "../../generated/graphql";
 import { Col, Layout, Row } from 'antd';
-import { UserLists, UserProfile } from "./components";
 import { Viewer } from "../../lib/types";
 import { PageSkeleton, ErrorBanner } from "../../lib/components";
+import { UserMoviesList } from "./components";
 
 const { Content } = Layout;
 
@@ -16,7 +16,7 @@ interface Props {
     viewer: Viewer;
 }
 
-export const User = (
+export const UserMovies = (
     { viewer }: Props
 ) => {
     const params = useParams();
@@ -53,17 +53,23 @@ export const User = (
     }
 
     const user = data ? data.user : null;
-    const viewerIsUser = viewer.id === params.id; 
 
-    const userProfileElement = user ? (
-        <UserProfile user={user} viewerIsUser={viewerIsUser}/>
+    const userMovies = user ? user.savedMovies : null;
+
+    const userMoviesElement = userMovies ? (
+        <UserMoviesList 
+            userMovies={userMovies} 
+            moviesPage={moviesPage} 
+            limit={PAGE_LIMIT} 
+            setMoviesPage={setMoviesPage} 
+        />
     ) : null;
 
     return (
         <Content className="user">
-            <Row gutter={[12, 24]} justify="space-between">
+            <Row gutter={12} justify="space-between">
                 <Col xs={24}>
-                    {userProfileElement}
+                    {userMoviesElement}
                 </Col>
             </Row>
         </Content>

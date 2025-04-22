@@ -3,11 +3,11 @@ import ReactDOM from 'react-dom/client';
 import '@ant-design/v5-patch-for-react-19';
 import {
   AppHeader,
-  MovieList, 
   Movies, 
   NotFound, 
   User, 
-  Login 
+  Login, 
+  Movie
 } from './sections';
 import { LOG_IN } from './lib/graphql/mutations';
 import { LogInMutation as LogInData, LogInMutationVariables as LogInVariables } from './generated/graphql';
@@ -26,6 +26,8 @@ import { Viewer } from './lib/types';
 import { AppHeaderSkeleton, ErrorBanner } from './lib/components';
 import { Affix, Layout, Spin } from 'antd';
 import './styles/index.css?';
+import { UserMovies } from './sections/UserMovies';
+import { PrivateRoute } from './lib/components/PrivateRoute';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -42,7 +44,7 @@ const authLink = new ApolloLink((operation, forward) => {
   operation.setContext(({ headers = {} }) => ({
     headers: {
       ...headers,
-      "X-CSRF-TOKEN": token || "",
+      "X-CSRF-TOKEN": token || ""
     }
   }));
 
@@ -71,6 +73,7 @@ const App = () => {
         setViewer(data.logIn as Viewer);
 
         if (data.logIn.token) {
+          sessionStorage.setItem("token_last", sessionStorage.getItem("token") ?? '');
           sessionStorage.setItem("token", data.logIn.token);
         } else {
           sessionStorage.removeItem("token");
@@ -105,11 +108,28 @@ const App = () => {
         </Affix>
         <Routes>
           <Route path='/' Component={Home} />
-          <Route 
-            path='/user/:id'
-            element={<User viewer={viewer} />}
+          <Route path='/user'>
+              <Route 
+                path=':id'
+                element={
+                  <PrivateRoute>
+                    <User viewer={viewer} />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path=":id/movies"
+                element={
+                  <PrivateRoute>
+                    <UserMovies viewer={viewer} />
+                  </PrivateRoute>
+                }
+              />
+          </Route>
+          <Route
+            path='/movie/:id'
+            element={<Movie viewer={viewer} />}
           />
-          <Route path='/user/:id/movies' Component={MovieList} />
           <Route
             path='/movies/'
             element={<Movies viewer={viewer} />}

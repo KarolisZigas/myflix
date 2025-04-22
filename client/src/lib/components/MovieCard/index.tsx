@@ -1,14 +1,15 @@
 import React, { useState } from "react"
 import { Card, Dropdown, Space, Typography } from "antd";
-import { UserOutlined, EditOutlined, PlusCircleOutlined, EllipsisOutlined, LinkOutlined, StarFilled, MinusCircleOutlined, ArrowRightOutlined } from "@ant-design/icons";
-import { DeleteMovieMutation, DeleteMovieMutationVariables, Movie, SavedMovie, SaveMovieMutation, SaveMovieMutationVariables } from "../../../generated/graphql";
+import { PlusCircleOutlined, EllipsisOutlined, LinkOutlined, StarFilled, MinusCircleOutlined, ArrowRightOutlined } from "@ant-design/icons";
+import { DeleteMovieMutation, DeleteMovieMutationVariables, SavedMovie, SaveMovieMutation, SaveMovieMutationVariables } from "../../../generated/graphql";
 import { useMutation } from "@apollo/client";
 import { DELETE_MOVIE } from "../../graphql/mutations/DeleteMovie";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Spin } from 'antd';
 import { SAVE_MOVIE } from "../../graphql/mutations/SaveMovie";
 import { displaySuccessNotification } from "../../utils";
 import { MenuProps } from "antd";
+import { DetailsModal } from "./components";
 
 interface Props {
     movie: SavedMovie
@@ -20,6 +21,7 @@ const { Meta } = Card;
 export const MovieCard = ({ movie }: Props) => {
     const params = useParams();
     const [savedMovie, setSavedMovie] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const { title, poster, id, originalId, genres, rating, imdbId, releaseDate, description, isSaved } = movie.movie
 
     const [deleteMovie,
@@ -94,6 +96,14 @@ export const MovieCard = ({ movie }: Props) => {
         />
     )
 
+    const handleModalOpen = () => {
+        setIsModalOpen(true);
+    }
+
+    const handleModalClose = () => {
+        setIsModalOpen(false);
+    }
+
     const items: MenuProps['items'] = [
         {
             key: '1',
@@ -107,9 +117,9 @@ export const MovieCard = ({ movie }: Props) => {
         {
             key: '2',
             label: (
-                <a className="flex gap-[6px]" target="_blank" rel="noopener noreferrer" href={`https://www.imdb.com/title/${imdbId}`}>
+                <div onClick={handleModalOpen} className="flex gap-[6px]">
                     Leave a note
-                </a>
+                </div>
             ),
         },
         {
@@ -124,38 +134,15 @@ export const MovieCard = ({ movie }: Props) => {
 
     const dropdownElement = (
         <Dropdown menu={{ items }}>
-            <a href="/" onClick={(e) => e.preventDefault()}>
+            <span className="cursor-pointer">
                 <Space>
                     <EllipsisOutlined key="ellipsis"/>
                 </Space>
-            </a>
+            </span>
         </Dropdown>
     );
 
     return (
-        // <Card 
-        //     hoverable 
-        //     cover={<div style={{ backgroundImage: `url(https://image.tmdb.org/t/p/original/${poster})` }}/>}
-        //     className="listing-card__cover-img"
-        // >
-        //     <div className="listing-card__details">
-        //         <div className="listing-card__description">
-        //             <Title level={4} className="listing-card__price">
-        //                 {title}
-        //             </Title>
-        //             <Text strong ellipsis className="listing-card__title">
-        //                 {releaseDate}
-        //             </Text>
-        //             <Text strong ellipsis className="listing-card__address">
-        //                 {description}
-        //             </Text>
-        //         </div>
-        //         <div className="listing-card__dimensions listing-card__dimensions--guests">
-        //             <UserOutlined />
-        //             <Text>{rating}</Text>
-        //         </div>
-        //     </div>
-        // </Card>
         <Spin spinning={deleteMovieLoading || loading}>
             <Card
                 classNames={{
@@ -163,17 +150,25 @@ export const MovieCard = ({ movie }: Props) => {
                     title: 'my-card'
                 }}
                 extra={ratingElement}
-                title={title}
+                title={
+                    <Link to={`/movie/${movie.movie.originalId}`} >
+                        {title}
+                    </Link>
+                }
                 style={{ width: 300 }}
                 cover={
-                    <img 
-                        alt={`${poster}`}
-                        src={`https://image.tmdb.org/t/p/original/${poster}`}
-                    />
+                    <Link to={`/movie/${movie.movie.originalId}`} >
+                        <img 
+                            alt={`${poster}`}
+                            src={`https://image.tmdb.org/t/p/original/${poster}`}
+                        />
+                    </Link>
                 }
                 actions={[
                     saveElement,
-                    <LinkOutlined key="edit"/>,
+                    <Link to={`/movie/${movie.movie.originalId}`}>
+                        <LinkOutlined key="edit"/>
+                    </Link>,
                     dropdownElement
                 ]}
             >
@@ -181,6 +176,11 @@ export const MovieCard = ({ movie }: Props) => {
                     description={description}
                 />
             </Card>
+            <DetailsModal
+                open={isModalOpen}
+                onClose={handleModalClose}
+                movie={movie}
+            />
         </Spin>
     )
 }

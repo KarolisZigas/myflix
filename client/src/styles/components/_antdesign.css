@@ -14,8 +14,16 @@
     @apply rounded-none w-[100%-2px] ml-[1px];
 }
 
-.ant-card .ant-card-cover img {
-    @apply aspect-[3/4] object-cover object-top rounded-none;
+.ant-card .ant-card-head .ant-card-head-title a {
+    @apply text-black hover:text-black;
+}
+
+.ant-card .ant-card-cover a {
+    @apply aspect-[3/4] object-cover object-top rounded-none overflow-hidden;
+}
+
+.ant-card .ant-card-cover a img {
+    @apply aspect-[3/4] object-cover object-top rounded-none w-[100%] h-[100%] hover:scale-105 transition-[transform] duration-300;
 }
 
 .ant-card .ant-card-actions li {

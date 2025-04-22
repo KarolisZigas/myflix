@@ -1,2 +1,2 @@
 export * from './UserProfile';
-export * from './UserMovies';
+export * from './UserLists';

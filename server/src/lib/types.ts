@@ -50,6 +50,7 @@ export interface User {
     name: string,
     contact: string,
     authorized?: boolean;
+    token_last?: string;
 }
 
 export interface Database {
